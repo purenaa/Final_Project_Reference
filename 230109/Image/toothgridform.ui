@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ToothGridForm</class>
+ <widget class="QWidget" name="ToothGridForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>948</width>
+    <height>457</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="layoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>70</y>
+     <width>711</width>
+     <height>311</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_6">
+    <item row="2" column="1">
+     <widget class="QWidget" name="widget_55" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_62">
+       <item>
+        <widget class="QSplitter" name="splitter_41">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <widget class="QGraphicsView" name="graphicsView_17"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="3">
+     <widget class="QWidget" name="widget_57" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_64">
+       <item>
+        <widget class="QSplitter" name="splitter_43">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <widget class="QGraphicsView" name="graphicsView_19"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QWidget" name="widget_49" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_56">
+       <item>
+        <widget class="QSplitter" name="splitter_35">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="2">
+     <widget class="QWidget" name="widget_61" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_68">
+       <item>
+        <widget class="QSplitter" name="splitter_47">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QGraphicsView" name="graphicsView_20"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QWidget" name="widget_53" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_60">
+       <item>
+        <widget class="QSplitter" name="splitter_39">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="1" column="0" rowspan="2">
+     <widget class="QWidget" name="widget_54" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_61">
+       <item>
+        <widget class="QSplitter" name="splitter_40">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="3" colspan="2">
+     <widget class="QWidget" name="widget_52" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_59">
+       <item>
+        <widget class="QSplitter" name="splitter_38">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="2" rowspan="2">
+     <widget class="QWidget" name="widget_51" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_58">
+       <item>
+        <widget class="QSplitter" name="splitter_37">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QGraphicsView" name="graphicsView_16"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QWidget" name="widget_50" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_57">
+       <item>
+        <widget class="QSplitter" name="splitter_36">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="4" colspan="2">
+     <widget class="QWidget" name="widget_58" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_65">
+       <item>
+        <widget class="QSplitter" name="splitter_44">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QWidget" name="widget_56" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_63">
+       <item>
+        <widget class="QSplitter" name="splitter_42">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QGraphicsView" name="graphicsView_18"/>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="5">
+     <widget class="QWidget" name="widget_63" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_70">
+       <item>
+        <widget class="QSplitter" name="splitter_49">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QWidget" name="widget_60" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_67">
+       <item>
+        <widget class="QSplitter" name="splitter_46">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QWidget" name="widget_59" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_66">
+       <item>
+        <widget class="QSplitter" name="splitter_45">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="3" column="3" colspan="2">
+     <widget class="QWidget" name="widget_62" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_69">
+       <item>
+        <widget class="QSplitter" name="splitter_48">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
