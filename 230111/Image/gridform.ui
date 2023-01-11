@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GridForm</class>
+ <widget class="QWidget" name="GridForm">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>556</width>
+    <height>358</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>GridForm</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_4">
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="0">
+         <widget class="QGraphicsView" name="graphicsView3"/>
+        </item>
+        <item row="0" column="0">
+         <widget class="QGraphicsView" name="graphicsView1"/>
+        </item>
+        <item row="0" column="1">
+         <widget class="QGraphicsView" name="graphicsView2"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QGraphicsView" name="graphicsView4"/>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
