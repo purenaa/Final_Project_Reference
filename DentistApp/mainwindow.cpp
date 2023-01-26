@@ -1,8 +1,10 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "layout.h"
-#include "fmx.h"
-//#include "listalbum.h"
+//#include "fmx.h"
+#include "maxlayout.h"
+#include "loginform.h"
+
 
 /* 환자 정보 DB */
 #include <QSqlDatabase>
@@ -27,6 +29,8 @@
 #include <QPoint>
 #include <QRectF>
 #include <QHash>
+#include <QStackedWidget>
+#include <QImage>
 
 
 
@@ -38,9 +42,47 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow), newScene(nullptr)
+    , ui(new Ui::MainWindow)/*, newScene(nullptr)*/
 {    
     ui->setupUi(this);
+
+    /* WindowTitle 지정 */
+    stackWidget = new QStackedWidget(this);
+    stackWidget->setWindowTitle(tr("2 X 2 Grid"));
+    connect(stackWidget, SIGNAL(destroyed()), stackWidget, SLOT(deleteLater()));
+
+//    loginStack = new QStackedWidget(this);
+//    connect(loginStack, SIGNAL(destroyed()), loginStack, SLOT(deleteLater()));
+
+    login = new LoginForm;                                                        // 로그인 화면
+    connect(login, SIGNAL(destroyed()), login, SLOT(deleteLater()));
+
+
+    customLayout = new Layout(this);                                                // 레이아웃 화면
+    connect(customLayout, SIGNAL(destroyed()), customLayout, SLOT(deleteLater()));
+    myMaxlayout = new Maxlayout(this);                                              // 최대 창
+    connect(myMaxlayout, SIGNAL(destroyed()), myMaxlayout, SLOT(deleteLater()));
+
+    //login->show();
+//    this->hide();
+
+
+//    loginStack->insertWidget(2, login);
+//    loginStack->insertWidget(3, this);
+//    loginStack->setCurrentWidget(login);
+
+    stackWidget->insertWidget(0, customLayout);
+    stackWidget->insertWidget(1, myMaxlayout);
+    stackWidget->setCurrentIndex(0);
+    QMdiSubWindow *cw = ui->mdiArea->addSubWindow(stackWidget);
+    stackWidget->showMaximized();
+//    ui->mdiArea->addSubWindow(fmx);
+    //cw->setStyleSheet("background:rgb(32, 56, 100)");
+    cw->setStyleSheet("background:rgb(0, 0, 0)");
+    ui->mdiArea->setActiveSubWindow(cw);
+
+
+
 
     styleColor();                                   // ui 색상 조절 및 크기 조절 함수
     loadImages();                                   // listWidget에 이미지 로드
@@ -52,22 +94,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     ui->listWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
+
+    /* 시그널 슬롯은 위치가 중요 동적할당(new)보다 밑에 있을 것 */
     connect(ui->listWidget, SIGNAL(itemClicked(QListWidgetItem*)), SLOT(selectItem(QListWidgetItem*)));
-
-    /* WindowTitle 지정 */
-    customLayout = new Layout(this);
-    customLayout->setWindowTitle(tr("2 X 2 Grid"));
-    connect(customLayout, SIGNAL(destroyed()), customLayout, SLOT(deleteLater()));
-
-    fmx = new FMX(this);
-    fmx->setWindowTitle(tr("14 FMX"));
-    connect(fmx, SIGNAL(destroyed()), fmx, SLOT(deleteLater()));
-
-    QMdiSubWindow *cw = ui->mdiArea->addSubWindow(customLayout);
-    ui->mdiArea->addSubWindow(fmx);
-    //cw->setStyleSheet("background:rgb(32, 56, 100)");
-    cw->setStyleSheet("background:rgb(0, 0, 0)");
-    ui->mdiArea->setActiveSubWindow(cw);
+    connect(customLayout, SIGNAL(sig_size(QGraphicsView*)), SLOT(layoutSizeChanged(QGraphicsView*)));
+    connect(myMaxlayout, SIGNAL(max_sig_size(QGraphicsView*)), SLOT(DoubleWidget(QGraphicsView*)));
+    connect(customLayout, SIGNAL(sig_widgetbyDClick(QGraphicsView*)), SLOT(DoubleWidget(QGraphicsView*)));
+    connect(myMaxlayout->viewQuit, SIGNAL(clicked()), SLOT(previousScreen()));
 }
 
 MainWindow::~MainWindow()
@@ -81,13 +114,19 @@ MainWindow::~MainWindow()
     }
 }
 
+void MainWindow::loginButton(QString DoctorID, QString password)
+{
+    qDebug() << "네 됩니다.";
+
+}
+
+
 void MainWindow::loadImages()
 {
     QDir dir(".");
     QStringList filters;
     filters << "*.png" << "*.jpg" << "*.bmp";
     QFileInfoList fileInfoList = dir.entryInfoList(filters, QDir::Files | QDir::NoDotAndDotDot);
-    //gridLayout->scene->clear();
 
     ui->listWidget->clear();
     for(int i=0; i<fileInfoList.count(); i++){
@@ -99,37 +138,9 @@ void MainWindow::loadImages()
 
 void MainWindow::selectItem(QListWidgetItem *item)
 {
-//    if(customLayout->g == false) {
-//        if(cnt == 0) {
-//            newScene1 = new QGraphicsScene;
-//            newScene1->setBackgroundBrush(Qt::black);
-//            customLayout->grid1->setScene(newScene1);
-//            QSize size = customLayout->grid1->viewport()->size();
-//            newScene1->addPixmap(QPixmap(item->statusTip()).scaled(size, Qt::KeepAspectRatio));
-//            customLayout->grid1->setAlignment(Qt::AlignCenter);
-
-//            cnt++;
-//            qDebug() << "click : 1";
-//        }
-
-//    else if(customLayout->g == true) {
-//        //----------------------------------------------------------------------
-
-//        newScene = new QGraphicsScene;
-//        newScene->setBackgroundBrush(Qt::black);
-//        customLayout->grid->setScene(newScene);
-//        newScene->update();
-//        QSize size = customLayout->grid->viewport()->size();
-//        newScene->addPixmap(QPixmap(item->statusTip()).scaled(size, Qt::KeepAspectRatio));
-//        customLayout->grid->setAlignment(Qt::AlignCenter);
-
-//        //----------------------------------------------------------------------
-//}
-
-// 다시 시도
-
     qDebug() << "Test";
 
+    /* view의 위치를 선택하지 않고 listWidget에 있는 이미지를 먼저 선택한 경우 */
     if(customLayout->g == false) {
         if(cnt == 0) {
             customLayout->grid = customLayout->grid1;
@@ -156,12 +167,10 @@ void MainWindow::selectItem(QListWidgetItem *item)
             qDebug() << "click : 3";
         }
 
-        qDebug() << "foreach";
         foreach(auto item, customLayout->scene->items()) {
             customLayout->scene->removeItem(item);
             delete item;
         }
-        //customLayout->scene->clear();
         customLayout->scene->setBackgroundBrush(Qt::black);
         QSize size = customLayout->grid->viewport()->size();
         QGraphicsPixmapItem *pixItem = customLayout->scene->addPixmap(QPixmap(item->statusTip()).scaled(size, Qt::KeepAspectRatio));
@@ -171,28 +180,12 @@ void MainWindow::selectItem(QListWidgetItem *item)
         itemHash[pixItem] = item->statusTip();
     }
 
+    /* view의 위치를 클릭하고 이미지를 선택한 경우 */
     else if(customLayout->g == true) {
-
-        //----------------------------------------------------------------------
-//            newScene = new QGraphicsScene;
-//            newScene->setBackgroundBrush(Qt::black);
-//            //customLayout->grid->setFixedSize(customLayout->grid->width(), customLayout->grid->height());
-//            //customLayout->grid->setFixedSize(customLayout->window()->size().width(), customLayout->window()->size().height());
-//            customLayout->grid->setScene(newScene);
-//            newScene->update();
-//            QSize size = customLayout->grid->viewport()->size();
-//            newScene->addPixmap(QPixmap(item->statusTip()).scaled(size, Qt::KeepAspectRatio));
-//            customLayout->grid->setAlignment(Qt::AlignCenter);
-//            //newScene->clear();
-//            //customLayout->grid->scene()->clear();
-
-        //----------------------------------------------------------------------
-
         foreach(auto item, customLayout->scene->items()) {
             customLayout->scene->removeItem(item);
             delete item;
         }
-        //customLayout->scene->clear();
         customLayout->scene->setBackgroundBrush(Qt::black);
         QSize size = customLayout->grid->viewport()->size();
         QGraphicsPixmapItem *pixItem = customLayout->scene->addPixmap(QPixmap(item->statusTip()).scaled(size, Qt::KeepAspectRatio));
@@ -200,72 +193,168 @@ void MainWindow::selectItem(QListWidgetItem *item)
         customLayout->scene->setSceneRect(pixItem->sceneBoundingRect());
         customLayout->grid->update();
         itemHash[pixItem] = item->statusTip();
+
+        customLayout->grid->resetTransform();
+    }
+}
+
+
+void MainWindow::layoutSizeChanged(QGraphicsView *grid)
+{
+    Q_UNUSED(grid);
+    qDebug() << "layoutSizeChanged 슬롯이 작동합니다.";
+
+    /* view 1,2,3,4의 크기 */
+    QSize itemSize1 = customLayout->grid1->viewport()->size();
+    QSize itemSize2 = customLayout->grid2->viewport()->size();
+    QSize itemSize3 = customLayout->grid3->viewport()->size();
+    QSize itemSize4 = customLayout->grid4->viewport()->size();
+
+    foreach(auto item, customLayout->scene1->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize1, Qt::KeepAspectRatio));
+        customLayout->scene1->setSceneRect(pixItem->sceneBoundingRect());
+    }
+
+    foreach(auto item, customLayout->scene2->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize2, Qt::KeepAspectRatio));
+        customLayout->scene2->setSceneRect(pixItem->sceneBoundingRect());
+    }
+
+    foreach(auto item, customLayout->scene3->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize3, Qt::KeepAspectRatio));
+        customLayout->scene3->setSceneRect(pixItem->sceneBoundingRect());
+    }
+
+    foreach(auto item, customLayout->scene4->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize4, Qt::KeepAspectRatio));
+        customLayout->scene4->setSceneRect(pixItem->sceneBoundingRect());
+    }
+
+//    /* 더블 클릭했을 때 view의 크기 */
+//    QSize itemSize5 = myMaxlayout->maxNewGrid->viewport()->size();
+
+//    foreach(auto item, myMaxlayout->maxNewSc->items()) {
+//        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+//        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize5, Qt::KeepAspectRatio));
+//        myMaxlayout->maxNewSc->setSceneRect(pixItem->sceneBoundingRect());
+//    }
+
+//----------------------------------------------------------------------------------------------------------------
+
+    if(d == true) {
+        /* view 1,2,3,4의 크기 */
+        QSize itemSize1 = customLayout->grid1->viewport()->size();
+        QSize itemSize2 = customLayout->grid2->viewport()->size();
+        QSize itemSize3 = customLayout->grid3->viewport()->size();
+        QSize itemSize4 = customLayout->grid4->viewport()->size();
+
+        foreach(auto item, customLayout->scene1->items()) {
+            QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+            pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize1, Qt::KeepAspectRatio));
+            customLayout->scene1->setSceneRect(pixItem->sceneBoundingRect());
+        }
+
+        foreach(auto item, customLayout->scene2->items()) {
+            QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+            pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize2, Qt::KeepAspectRatio));
+            customLayout->scene2->setSceneRect(pixItem->sceneBoundingRect());
+        }
+
+        foreach(auto item, customLayout->scene3->items()) {
+            QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+            pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize3, Qt::KeepAspectRatio));
+            customLayout->scene3->setSceneRect(pixItem->sceneBoundingRect());
+        }
+
+        foreach(auto item, customLayout->scene4->items()) {
+            QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+            pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize4, Qt::KeepAspectRatio));
+            customLayout->scene4->setSceneRect(pixItem->sceneBoundingRect());
+        }
+    }
+}
+
+void MainWindow::DoubleWidget(QGraphicsView* grid)
+{
+    qDebug("Double?????? Checking");
+    myMaxlayout->setNewSc(customLayout->grid->scene());
+
+    stackWidget->setCurrentIndex(1);
+
+    /* 더블 클릭했을 때 view의 크기 */
+    QSize itemSize5 = myMaxlayout->maxNewGrid->viewport()->size();
+
+    foreach(auto item, myMaxlayout->maxNewSc->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize5, Qt::KeepAspectRatio));
+        myMaxlayout->maxNewSc->setSceneRect(pixItem->sceneBoundingRect());
+    }
+    myMaxlayout->viewQuit->setGeometry(myMaxlayout->maxNewGrid->width()-45, 10, 30, 30);
+
+    myMaxlayout->maxNewGrid->resetTransform();
+}
+
+void MainWindow::previousScreen()
+{
+    stackWidget->setCurrentIndex(0);
+
+    d = true;
+
+    QSize itemSize1 = customLayout->grid1->viewport()->size();
+    QSize itemSize2 = customLayout->grid2->viewport()->size();
+    QSize itemSize3 = customLayout->grid3->viewport()->size();
+    QSize itemSize4 = customLayout->grid4->viewport()->size();
+
+    foreach(auto item, customLayout->scene1->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize1, Qt::KeepAspectRatio));
+        customLayout->scene1->setSceneRect(pixItem->sceneBoundingRect());
+    }
+
+    foreach(auto item, customLayout->scene2->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize2, Qt::KeepAspectRatio));
+        customLayout->scene2->setSceneRect(pixItem->sceneBoundingRect());
+    }
+
+    foreach(auto item, customLayout->scene3->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize3, Qt::KeepAspectRatio));
+        customLayout->scene3->setSceneRect(pixItem->sceneBoundingRect());
+    }
+
+    foreach(auto item, customLayout->scene4->items()) {
+        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
+        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemSize4, Qt::KeepAspectRatio));
+        customLayout->scene4->setSceneRect(pixItem->sceneBoundingRect());
     }
 }
 
 
 void MainWindow::resizeEvent(QResizeEvent* event)
 {
-    QSize itemIize1 = customLayout->grid1->viewport()->size();
-    QSize itemIize2 = customLayout->grid1->viewport()->size();
-    QSize itemIize3 = customLayout->grid1->viewport()->size();
-    QSize itemIize4 = customLayout->grid1->viewport()->size();
+    Q_UNUSED(event);
+//    qDebug("widget changed");
+//    qDebug("위젯 변화에 따른 viewport : %d", customLayout->grid1->viewport()->size());
 
-    foreach(auto item, customLayout->scene1->items()) {
-        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
-        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemIize1, Qt::KeepAspectRatio));
-        qDebug() << itemHash[pixItem];
-//        customLayout->grid1->setAlignment(Qt::AlignCenter);
-        customLayout->scene1->setSceneRect(pixItem->sceneBoundingRect());
-    }
-
-    foreach(auto item, customLayout->scene2->items()) {
-        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
-        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemIize2, Qt::KeepAspectRatio));
-        qDebug() << itemHash[pixItem];
-//        customLayout->grid1->setAlignment(Qt::AlignCenter);
-        customLayout->scene2->setSceneRect(pixItem->sceneBoundingRect());
-    }
-
-    foreach(auto item, customLayout->scene3->items()) {
-        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
-        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemIize3, Qt::KeepAspectRatio));
-        qDebug() << itemHash[pixItem];
-//        customLayout->grid1->setAlignment(Qt::AlignCenter);
-        customLayout->scene3->setSceneRect(pixItem->sceneBoundingRect());
-    }
-
-    foreach(auto item, customLayout->scene4->items()) {
-        QGraphicsPixmapItem* pixItem = dynamic_cast<QGraphicsPixmapItem*>(item);
-        pixItem->setPixmap(QPixmap(itemHash[pixItem]).scaled(itemIize4, Qt::KeepAspectRatio));
-        qDebug() << itemHash[pixItem];
-//        customLayout->grid1->setAlignment(Qt::AlignCenter);
-        customLayout->scene4->setSceneRect(pixItem->sceneBoundingRect());
-    }
-    qDebug("widget changed");
-    qDebug("위젯 변화에 따른 viewport : %d", customLayout->grid1->viewport()->size());
 }
 
 void MainWindow::changeEvent(QEvent *event)
 {
-    QMainWindow::changeEvent(event);
-    if(event->type() == QEvent::WindowStateChange) {                 // 윈도우 창 변경 (최소화, 최대화)
-//        customLayout->grid1->viewport()->size();
-//        qDebug("window Changed");
-//        qDebug("윈도우 사이즈 변화에 따른 viewport : %d", customLayout->grid1->viewport()->size());
-    }
+    Q_UNUSED(event);
+//    QMainWindow::changeEvent(event);
+//    if(event->type() == QEvent::WindowStateChange) {                 // 윈도우 창 변경 (최소화, 최대화)
+////        customLayout->grid1->viewport()->size();
+////        qDebug("window Changed");
+////        qDebug("윈도우 사이즈 변화에 따른 viewport : %d", customLayout->grid1->viewport()->size());
+//    }
 }
 
-void MainWindow::DoubleWidget()
-{
-    qDebug("Double??????");
-    customLayout->w = true;
-//    QWidget *widget = new QWidget(customLayout);
-//    widget->show();
-}
-
-
-void MainWindow::on_imageClearPushButton_clicked()                  // scene 이미지 초기화
+void MainWindow::on_layoutClearPushButton_clicked()                    // scene 이미지 초기화
 {
     customLayout->grid1->scene()->clear();
     customLayout->grid2->scene()->clear();
@@ -402,6 +491,7 @@ void MainWindow::styleColor()
     ui->horizontalSpacer_9->changeSize(10,10);
     ui->horizontalSpacer_10->changeSize(10,10);
     ui->verticalSpacer_5->changeSize(12, 30);
+    ui->imageSizeClearPushButton->setFixedSize(70, 40);
 
     /* toolButton 크기 조절 */
     ui->brushToolButton->setIconSize(QSize(50,40));
@@ -461,4 +551,67 @@ void MainWindow::customLayoutLocation()
     qDebug("grid4의 ButtomRight : (%d, %d)\n", width4, height4);
 }
 
+
+void MainWindow::on_zoomInToolButton_clicked()
+{
+    if(customLayout->g == true) {
+        customLayout->grid->scale(1.25, 1.25);
+        customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    }
+
+    myMaxlayout->maxNewGrid->scale(1.25, 1.25);
+    customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+}
+
+void MainWindow::on_zoomOutToolButton_clicked()
+{
+    if(customLayout->g == true) {
+        customLayout->grid->scale(0.8, 0.8);
+        customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    }
+    myMaxlayout->maxNewGrid->scale(0.8, 0.8);
+    customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+}
+
+void MainWindow::on_leftRotateToolButton_clicked()
+{
+    if(customLayout->g == true) {
+        customLayout->grid->rotate(90);
+        customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    }
+    myMaxlayout->maxNewGrid->rotate(90);
+    customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+}
+
+void MainWindow::on_rightRotateToolButton_clicked()
+{
+    if(customLayout->g == true) {
+        customLayout->grid->rotate(-90);
+        customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    }
+    myMaxlayout->maxNewGrid->rotate(-90);
+    customLayout->grid->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    customLayout->grid->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+}
+
+void MainWindow::on_imageSizeClearPushButton_clicked()
+{
+    if(customLayout->g == true)
+        customLayout->grid->resetTransform();
+
+    myMaxlayout->maxNewGrid->resetTransform();
+}
+
+
+void MainWindow::on_verticalFlipToolButton_clicked()
+{
+
+}
 

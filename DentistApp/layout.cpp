@@ -1,4 +1,5 @@
 #include "layout.h"
+//#include <opencv2/opencv.hpp>
 
 #include <QGridLayout>
 #include <QGraphicsView>
@@ -9,6 +10,11 @@
 
 #include <QPushButton>
 #include <QSizePolicy>
+
+
+//#include <QGraphicsSceneEvent>
+
+
 
 
 Layout::Layout(QWidget *parent)
@@ -35,14 +41,10 @@ Layout::Layout(QWidget *parent)
     grid4->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 
-
-
-//    grid1->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
-//    grid2->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
-//    grid3->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
-//    grid4->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
-
-    //grid1->setSizePolicy(QSizePolicy(QSizePolicy::IgnoreAspectRatio, QSizePolicy::IgnoreAspectRatio));
+    grid1->setStyleSheet("border: 0.5px solid rgb(129, 134, 143);");
+    grid2->setStyleSheet("border: 0.5px solid rgb(129, 134, 143);");
+    grid3->setStyleSheet("border: 0.5px solid rgb(129, 134, 143);");
+    grid4->setStyleSheet("border: 0.5px solid rgb(129, 134, 143);");
 
     grid1->setScene(scene1);
     grid2->setScene(scene2);
@@ -50,6 +52,11 @@ Layout::Layout(QWidget *parent)
     grid4->setScene(scene4);
 
     grid = grid1;
+
+
+    //grid1->viewport()->installEventFilter(this);
+    grid->installEventFilter(this);
+    setMouseTracking(true);
 }
 
 /* 2 X 2 Grid */
@@ -84,7 +91,6 @@ void Layout::mousePressEvent(QMouseEvent *event)
     if(event->button() == Qt::LeftButton) {
         clickPoint = event->pos();
 
-
         int x1 = grid1->pos().x();                 // grid1의 topLeft의 x 좌표값
         int y1 = grid1->pos().y();                 // grid1의 topLeft의 y 좌표값
         int width1 = x1 + grid1->width();          // grid1의 topLeft의 x좌표값에서 grid의 폭만큼 이동한 x의 좌표값
@@ -108,55 +114,57 @@ void Layout::mousePressEvent(QMouseEvent *event)
         int width4 = x4 + grid4->width();
         int height4 = y4 + grid4->height();
 
-        //        g = true;
-        //        if(g == true) {
 
-
+        /* grid 1번 위치 */
         if((clickPoint.x() >= x1 && clickPoint.x() <= width1) && (clickPoint.y() >= y1 && clickPoint.y() <= height1)) {
             g = true;
             grid = grid1;
             scene = scene1;
 
-//            grid1->setStyleSheet("border: 2px solid rgb(0,255,0)");
+//            grid1->setStyleSheet("border: 0.5px solid rgb(0,255,0)");
 //            grid2->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid3->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid4->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 
             qDebug("scene1 clicked 1");
         }
+
+        /* grid 2번 위치 */
         else if((clickPoint.x() >= x2 && clickPoint.x() <= width2) && (clickPoint.y() >= y2 && clickPoint.y() <= height2)) {
             g = true;
             grid = grid2;
             scene = scene2;
 
-//            grid2->setStyleSheet("border: 2px solid rgb(0,255,0)");
+//            grid2->setStyleSheet("border: 0.5px solid rgb(0,255,0)");
 //            grid1->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid3->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid4->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 
             qDebug("scene2 clicked 2");
         }
+
+        /* grid 3번 위치 */
         else if((clickPoint.x() >= x3 && clickPoint.x() <= width3) && (clickPoint.y() >= y3 && clickPoint.y() <= height3)) {
             g = true;
             grid = grid3;
             scene = scene3;
 
-
-//            grid3->setStyleSheet("border: 2px solid rgb(0,255,0)");
+//            grid3->setStyleSheet("border: 0.5px solid rgb(0,255,0)");
 //            grid1->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid2->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid4->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 
             qDebug("scene3 clicked 3");
         }
+
+        /* grid 4번 위치 */
         else if((clickPoint.x() >= x4 && clickPoint.x() <= width4) && (clickPoint.y() >= y4 && clickPoint.y() <= height4)) {
             //grid4->setScene(scene4);
             g = true;
             grid = grid4;
             scene = scene4;
 
-
-//            grid4->setStyleSheet("border: 2px solid rgb(0,255,0)");
+//            grid4->setStyleSheet("border: 0.5px solid rgb(0,255,0)");
 //            grid1->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid2->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
 //            grid3->setStyleSheet("border: 0.5px solid rgb(129, 134, 143)");
@@ -166,9 +174,6 @@ void Layout::mousePressEvent(QMouseEvent *event)
         qDebug("시그널");
     }
 }
-
-
-
 
 void Layout::mouseDoubleClickEvent(QMouseEvent *event)
 {
@@ -181,56 +186,42 @@ void Layout::mouseDoubleClickEvent(QMouseEvent *event)
                 && (clickPoint.y() >= grid1->pos().y() && clickPoint.y() <= grid1->pos().y() + grid1->height())) {
 
             grid = grid1;
-            scene = scene1;
-            w = true;
-
-//            DoubleWidget();
-//            newView->setScene(grid1->scene());
-//            widget->show();
+            emit sig_widgetbyDClick(grid);
 
             qDebug() << "Double check1";
         }
         else if((clickPoint.x() >= grid2->pos().x() && clickPoint.x() <= grid2->pos().x() + grid2->width())
                 && (clickPoint.y() >= grid2->pos().y() && clickPoint.y() <= grid2->pos().y() + grid2->height())) {
 
-            DoubleWidget();
-            newView->setScene(grid2->scene());
-            widget->show();
+            grid = grid2;
+            emit sig_widgetbyDClick(grid);
 
             qDebug() << "Double check2";
         }
         else if((clickPoint.x() >= grid3->pos().x() && clickPoint.x() <= grid3->pos().x() + grid3->width())
                 && (clickPoint.y() >= grid3->pos().y() && clickPoint.y() <= grid3->pos().y() + grid3->height())) {
 
-            DoubleWidget();
-            newView->setScene(grid3->scene());
-            widget->show();
+            grid = grid3;
+            emit sig_widgetbyDClick(grid);
 
             qDebug() << "Double check3";
         }
         else if((clickPoint.x() >= grid4->pos().x() && clickPoint.x() <= grid4->pos().x() + grid4->width())
                 && (clickPoint.y() >= grid4->pos().y() && clickPoint.y() <= grid4->pos().y() + grid4->height())) {
 
-            DoubleWidget();
-            newView->setScene(grid4->scene());
-            widget->show();
+            grid = grid4;
+            emit sig_widgetbyDClick(grid);
 
             qDebug() << "Double check4";
         }
     }
-
 }
 
-void Layout::DoubleWidget()
+
+void Layout::resizeEvent(QResizeEvent* event)
 {
-    widget = new QWidget(this);
-    widget->setFixedSize(this->size().width(), this->size().height());
-    newView = new QGraphicsView(widget);
-    newView->setFixedSize(widget->width(), widget->height());
-    newView->setBackgroundBrush(Qt::black);
-    viewQuit = new QPushButton("X", widget);
-    viewQuit->setGeometry(widget->width()-50, 10, 30, 30);
-    viewQuit->setStyleSheet("background:rgb(255, 255, 255)");
+    Q_UNUSED(event);
+    emit sig_size(grid);
 }
 
 
@@ -240,23 +231,43 @@ void Layout::DoubleWidget()
 
 
 
-
-
-//void FramelessResize::DragResize(QEvent *ev)
+//void Layout::mouseMoveEvent(QMouseEvent *event)
 //{
-////    QHoverEvent* e = (QHoverEvent*)ev;
-////    QMargins offset;
-////    if(_pressDirection & LEFT)
-////        offset.setLeft((e->oldPos() - e->pos()).x());
-////    if(_pressDirection & RIGHT)
-////        offset.setRight((e->pos() - e->oldPos() ).x());
-////    if(_pressDirection & TOP)
-////        offset.setTop((e->oldPos() - e->pos()).y());
-////    if(_pressDirection & BOTTOM)
-////        offset.setBottom((e->pos() - e->oldPos() ).y());
+////    event->ignore();
 
-////    emit OffsetGeometry(offset);
+//    qDebug() << "당당당";
+
 //}
+
+//bool Layout::eventFilter(QObject * obj, QEvent * ev)
+//{
+////    QPoint p;
+////    if (obj == grid1)
+////        if (event->type() == QEvent::MouseMove)
+////        {
+////            QMouseEvent *mEvent = (QMouseEvent*)event;
+////            p = mEvent->pos();
+////        }
+////    return false;
+
+////    if (grid1->viewport())
+////            if (event->type() == QEvent::MouseMove)
+////            {
+////                QMouseEvent *mEvent = (QMouseEvent*)event;
+////                p = mEvent->pos();
+////            }
+
+//    if (obj == grid1)
+//        if (ev->type() == QEvent::MouseMove)
+//        {
+//            QMouseEvent *mEvent = (QMouseEvent*)ev;
+//            clickPoint = mEvent->pos();
+//        }
+//    return false;
+
+//    qDebug() << "당당당";
+//}
+
 
 
 

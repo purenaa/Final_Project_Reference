@@ -14,6 +14,9 @@ class QGraphicsScene;
 class QSqlQuery;
 class QSqlTableModel;
 class QGraphicsPixmapItem;
+class QStackedWidget;
+class Maxlayout;
+class LoginForm;
 
 
 QT_BEGIN_NAMESPACE
@@ -30,15 +33,19 @@ public:
 
     void styleColor();                  // ui 색상 조절
     void customLayoutLocation();        // customLayout의 graphicsView 위치 좌표값
+    void loadImages();                  // 이미지 로드
+
+    bool d = false;
+//    bool s = false;
 
 
-    void loadImages();
+    bool r = false;
+    bool y = false;
 
-    void toggleMaximized();
+    bool c = false;
 
-
-    void DoubleWidget();
-
+    /* 로그인 창 */
+    QStackedWidget *loginStack;
 
 
 protected:
@@ -46,15 +53,26 @@ protected:
     void resizeEvent(QResizeEvent *event) override;                 // 위젯 창 변경될 때
 
 
-
 public slots:
     void selectItem(QListWidgetItem*);
+    void previousScreen();              // 이전 화면 (layout클래스 화면으로 돌아감)
+    void loginButton(QString, QString);
 
 
 private slots:
-    void on_imageClearPushButton_clicked();
+    void on_layoutClearPushButton_clicked();
+    void on_zoomInToolButton_clicked();
+    void on_zoomOutToolButton_clicked();
+    void on_leftRotateToolButton_clicked();
+    void on_rightRotateToolButton_clicked();
 
 
+    void layoutSizeChanged(QGraphicsView *grid);
+    void DoubleWidget(QGraphicsView *grid);
+
+    void on_imageSizeClearPushButton_clicked();
+
+    void on_verticalFlipToolButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -62,27 +80,14 @@ private:
     /* 레이아웃 */
     Layout *customLayout;
     FMX *fmx;
+    Maxlayout *myMaxlayout;
+    LoginForm *login;
 
-    QGraphicsView *newView;
-    QGraphicsScene *newScene;
-    QSize size;
-
-    /* 주석처리 가능 */
-    QGraphicsScene *newScene1;
-    QGraphicsScene *newScene2;
-    QGraphicsScene *newScene3;
-    QGraphicsScene *newScene4;
+    /* 이중 창 */
+    QStackedWidget *stackWidget;
 
 
     int cnt = 0;
-
-
-//    /* 좌표 측정 */
-//    int x1;
-//    int y1;
-//    int width1;
-//    int height1;
-
 
     /* 환자 정보 DB */
     void patientLoad();
@@ -90,21 +95,9 @@ private:
     QSqlQuery *patientQuery;
     QSqlTableModel *patientQueryModel;
 
-
-
     QHash<QGraphicsPixmapItem*, QString> itemHash;
 
 
-    QHash<int, QList<QString>> hashItem;
-    QList<QString> listItem;
-
-    QMap<QString, MainWindow*> mainList;
-
-
-
 signals:
-    void sig_currentImage(int);
-
-    //void sig_test(QString);
 };
 #endif // MAINWINDOW_H

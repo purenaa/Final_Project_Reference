@@ -26,4 +26,7 @@
         <file>Image/down7.png</file>
         <file>Image/up7.png</file>
     </qresource>
+    <qresource prefix="/">
+        <file>trademark/osstem.jpg</file>
+    </qresource>
 </RCC>
